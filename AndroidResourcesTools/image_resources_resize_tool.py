@@ -10,16 +10,18 @@ class Density(Enum):
     xxhdpi = 3
     xxxhdpi = 4
 
+output_folder = ""
 input_file = sys.argv[1]
 input_file_dimen = sys.argv[2]
+if len(sys.argv) == 4:
+    output_folder = sys.argv[3]
 
 def create_resized_image(destination_density : Density):
-    input_image_name = (os.path.splitext(input_file)[0])[2:]
-    output_directory = "drawable-" + destination_density._name_
-    print(output_directory)
-    output_file_path =os.path.join(output_directory, input_image_name + ".png")
-    if not os.path.exists(output_directory):
-        os.mkdir(output_directory)
+    input_image_name = (os.path.splitext(input_file)[0]).split("\\")[-1]
+    output_directory = os.path.join(output_folder,"drawable-" + destination_density._name_) if output_folder != "" else "drawable-" + destination_density._name_
+    output_file_path = os.path.join(output_directory, input_image_name + ".png")
+    if not os.path.isdir(output_directory):
+        os.makedirs(output_directory)
     try:
         im = Image.open(input_file)
         out_width = int(im.size[0] * (destination_density.value / int(input_file_dimen)))
@@ -29,6 +31,7 @@ def create_resized_image(destination_density : Density):
     except IOError as e:
         print (e)
 
-for density in Density :
+
+for density in Density:
     if(density.value <= int(input_file_dimen)):
         create_resized_image(density)
